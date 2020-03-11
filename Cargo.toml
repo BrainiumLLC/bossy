@@ -1,0 +1,15 @@
+[package]
+name = "bossy"
+version = "0.1.1"
+authors = ["Brainium Studios LLC"]
+edition = "2018"
+description = "Opinionated convenience wrapper for `std::process::Command` and friends"
+documentation = "https://docs.rs/bossy"
+repository = "https://github.com/BrainiumLLC/bossy"
+readme = "README.md"
+keywords = ["process", "shell", "command"]
+categories = ["rust-patterns"]
+license = "Apache-2.0/MIT"
+
+[dependencies]
+log = "0.4.8"
