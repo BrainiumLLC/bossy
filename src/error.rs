@@ -13,35 +13,6 @@ pub enum Cause {
     CommandFailedWithOutput(Output),
 }
 
-impl Display for Cause {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::SpawnFailed(err) => write!(f, "Failed to spawn child process: {}", err),
-            Self::WaitFailed(err) => write!(f, "Failed to wait for child process to exit: {}", err),
-            Self::CommandFailed(status) => {
-                write!(f, "Command didn't complete successfully, ")?;
-                if let Some(exit_code) = status.code() {
-                    write!(f, "exiting with code {}.", exit_code)
-                } else {
-                    write!(f, "but returned no exit code.")
-                }
-            }
-            Self::CommandFailedWithOutput(output) => {
-                write!(f, "{} ", Self::CommandFailed(output.status()))?;
-                if !output.stderr().is_empty() {
-                    write!(
-                        f,
-                        "stderr contents: {}",
-                        String::from_utf8_lossy(output.stderr())
-                    )
-                } else {
-                    write!(f, "stderr was empty.")
-                }
-            }
-        }
-    }
-}
-
 impl Cause {
     fn from_io_err(err: io::Error) -> Self {
         Self::WaitFailed(err)
@@ -90,7 +61,44 @@ pub struct Error {
 
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Command {:?} failed: {}", self.command, self.cause)
+        fn command_failed(
+            f: &mut fmt::Formatter,
+            command: &str,
+            status: ExitStatus,
+        ) -> fmt::Result {
+            write!(f, "Command {:?} didn't complete successfully, ", command)?;
+            if let Some(exit_code) = status.code() {
+                write!(f, "exiting with code {}.", exit_code)
+            } else {
+                write!(f, "but returned no exit code.")
+            }
+        }
+
+        match &self.cause {
+            Cause::SpawnFailed(err) => write!(
+                f,
+                "Failed to spawn child process for command {:?}: {}",
+                self.command, err
+            ),
+            Cause::WaitFailed(err) => write!(
+                f,
+                "Failed to wait for child process for command {:?} to exit: {}",
+                self.command, err
+            ),
+            Cause::CommandFailed(status) => command_failed(f, &self.command, *status),
+            Cause::CommandFailedWithOutput(output) => {
+                command_failed(f, &self.command, output.status())?;
+                if !output.stderr().is_empty() {
+                    write!(
+                        f,
+                        "stderr contents: {}",
+                        String::from_utf8_lossy(output.stderr())
+                    )
+                } else {
+                    write!(f, "stderr was empty.")
+                }
+            }
+        }
     }
 }
 
