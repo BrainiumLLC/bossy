@@ -52,6 +52,30 @@ impl Command {
         this
     }
 
+    /// The same as `impure`, but parses the command from a string of
+    /// whitespace-separated args, just like how you'd write the command in a
+    /// terminal.
+    pub fn impure_parse(arg_str: impl AsRef<str>) -> Option<Self> {
+        let arg_str = arg_str.as_ref();
+        let mut args = arg_str.split_whitespace();
+        args.next().map(|name| {
+            let mut this = Self::impure(name);
+            this.add_args(args);
+            this
+        })
+    }
+
+    /// The same as `pure`, but parses the command from a string of
+    /// whitespace-separated args, just like how you'd write the command in a
+    /// terminal.
+    pub fn pure_parse(arg_str: impl AsRef<str>) -> Option<Self> {
+        let mut this = Self::impure_parse(arg_str);
+        if let Some(this) = this.as_mut() {
+            this.inner.env_clear();
+        }
+        this
+    }
+
     /// Get the command's string representation.
     pub fn display(&self) -> &str {
         &self.display
@@ -181,6 +205,19 @@ impl Command {
 
     pub fn with_args(mut self, args: impl IntoIterator<Item = impl AsRef<OsStr>>) -> Self {
         self.add_args(args);
+        self
+    }
+
+    /// The same as `add_args`, but parses the arg list from a string of
+    /// whitespace-separated args, just like how you'd see them in a terminal.
+    pub fn add_parsed_args(&mut self, arg_str: impl AsRef<str>) -> &mut Self {
+        self.add_args(arg_str.as_ref().split_whitespace())
+    }
+
+    /// The same as `with_args`, but parses the arg list from a string of
+    /// whitespace-separated args, just like how you'd see them in a terminal.
+    pub fn with_parsed_args(mut self, arg_str: impl AsRef<str>) -> Self {
+        self.add_parsed_args(arg_str);
         self
     }
 
