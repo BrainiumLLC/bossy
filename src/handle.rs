@@ -1,4 +1,4 @@
-use crate::{ChildStdin, Error, ExitStatus, Output};
+use crate::{ChildStderr, ChildStdin, ChildStdout, Error, ExitStatus, Output};
 use std::{io, process};
 
 #[derive(Debug)]
@@ -48,6 +48,14 @@ impl Handle {
 
     pub fn stdin(&mut self) -> Option<&mut ChildStdin> {
         self.as_mut().inner.stdin.as_mut()
+    }
+
+    pub fn stdout(&mut self) -> Option<&mut ChildStdout> {
+        self.as_mut().inner.stdout.as_mut()
+    }
+
+    pub fn stderr(&mut self) -> Option<&mut ChildStderr> {
+        self.as_mut().inner.stderr.as_mut()
     }
 
     pub fn kill(&mut self) -> io::Result<()> {
