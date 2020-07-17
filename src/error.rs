@@ -91,11 +91,11 @@ impl Display for Error {
                 if !output.stderr().is_empty() {
                     write!(
                         f,
-                        "stderr contents: {}",
+                        " stderr contents: {}",
                         String::from_utf8_lossy(output.stderr())
                     )
                 } else {
-                    write!(f, "stderr was empty.")
+                    write!(f, " stderr was empty.")
                 }
             }
         }
