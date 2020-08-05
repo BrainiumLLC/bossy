@@ -1,5 +1,6 @@
 use crate::{ExitStatus, Handle, Output};
 use std::{
+    error::Error as StdError,
     fmt::{self, Display},
     io, process, str,
 };
@@ -98,6 +99,16 @@ impl Display for Error {
                     write!(f, " stderr was empty.")
                 }
             }
+        }
+    }
+}
+
+impl StdError for Error {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        match &self.cause {
+            Cause::SpawnFailed(err) => Some(err as _),
+            Cause::WaitFailed(err) => Some(err as _),
+            _ => None,
         }
     }
 }
