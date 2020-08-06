@@ -55,7 +55,7 @@ impl Command {
     /// The same as `impure`, but parses the command from a string of
     /// whitespace-separated args, just like how you'd write the command in a
     /// terminal.
-    pub fn impure_parse(arg_str: impl AsRef<str>) -> Option<Self> {
+    pub fn try_impure_parse(arg_str: impl AsRef<str>) -> Option<Self> {
         let arg_str = arg_str.as_ref();
         let mut args = arg_str.split_whitespace();
         args.next().map(|name| {
@@ -65,15 +65,25 @@ impl Command {
         })
     }
 
+    /// The same as `try_impure_parse`, but panics if given an empty string.
+    pub fn impure_parse(arg_str: impl AsRef<str>) -> Self {
+        Self::try_impure_parse(arg_str).expect("passed an empty string to `impure_parse`")
+    }
+
     /// The same as `pure`, but parses the command from a string of
     /// whitespace-separated args, just like how you'd write the command in a
     /// terminal.
-    pub fn pure_parse(arg_str: impl AsRef<str>) -> Option<Self> {
-        let mut this = Self::impure_parse(arg_str);
+    pub fn try_pure_parse(arg_str: impl AsRef<str>) -> Option<Self> {
+        let mut this = Self::try_impure_parse(arg_str);
         if let Some(this) = this.as_mut() {
             this.inner.env_clear();
         }
         this
+    }
+
+    /// The same as `try_pure_parse`, but panics if given an empty string.
+    pub fn pure_parse(arg_str: impl AsRef<str>) -> Self {
+        Self::try_pure_parse(arg_str).expect("passed an empty string to `pure_parse`")
     }
 
     /// Get the command's string representation.
