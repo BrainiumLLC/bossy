@@ -2,7 +2,7 @@
 
 [![crates.io badge](http://meritbadge.herokuapp.com/bossy)](https://crates.io/crates/bossy)
 [![docs.rs badge](https://docs.rs/bossy/badge.svg)](https://docs.rs/bossy)
-[![Travis badge](https://travis-ci.org/BrainiumLLC/bossy.svg?branch=master)](https://travis-ci.org/BrainiumLLC/bossy)
+[![CI Status](https://github.com/BrainiumLLC/bossy/workflows/CI/badge.svg)](https://github.com/BrainiumLLC/bossy/actions)
 
 Opinionated convenience wrappers for `std::process::Command` and friends.
 
