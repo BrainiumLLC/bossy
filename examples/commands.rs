@@ -1,14 +1,3 @@
-# `bossy`
-
-[![crates.io badge](http://meritbadge.herokuapp.com/bossy)](https://crates.io/crates/bossy)
-[![docs.rs badge](https://docs.rs/bossy/badge.svg)](https://docs.rs/bossy)
-[![Travis badge](https://travis-ci.org/BrainiumLLC/bossy.svg?branch=master)](https://travis-ci.org/BrainiumLLC/bossy)
-
-Opinionated convenience wrappers for `std::process::Command` and friends.
-
-This crate arose from patterns I found while working [`cargo-mobile`](https://github.com/BrainiumLLC/cargo-mobile), which does a *ton* of subprocessing. In my not-entirely-humble opinion, `bossy` makes working with commands super convenient!
-
-```rust
 use bossy::Command;
 use std::{io::Write as _, path::Path};
 
@@ -78,13 +67,3 @@ fn main() -> bossy::Result<()> {
 
     Ok(())
 }
-```
-
-You can run [the example](examples/commands.rs) to see the exact same code as above, but like, with output:
-
-```sh
-cargo run --example commands
-```
-
-This isn't a ton of documentation, but this is a pretty thin wrapper, so documentation for `std::process` will typically apply here as well.
-
