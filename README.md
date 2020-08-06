@@ -6,7 +6,7 @@
 
 Opinionated convenience wrappers for `std::process::Command` and friends.
 
-This crate arose from patterns I found while working [`cargo-mobile`](https://github.com/BrainiumLLC/cargo-mobile), which does a *ton* of subprocessing. In my not-entirely-humble opinion, `bossy` makes working with commands super convenient!
+This crate arose from patterns I found while working on [`cargo-mobile`](https://github.com/BrainiumLLC/cargo-mobile), which does a *ton* of subprocessing. In my not-entirely-humble opinion, `bossy` makes working with commands super convenient!
 
 ```rust
 use bossy::Command;
