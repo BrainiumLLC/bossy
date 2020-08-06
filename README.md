@@ -86,5 +86,5 @@ You can run [the example](examples/commands.rs) to see the exact same code as ab
 cargo run --example commands
 ```
 
-This isn't a ton of documentation, but this is a pretty thin wrapper, so documentation for `std::process` will typically apply here as well.
+There isn't a ton of documentation, but this is a pretty thin wrapper, so documentation for `std::process` will typically apply here as well.
 

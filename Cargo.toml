@@ -1,9 +1,9 @@
 [package]
 name = "bossy"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Francesca Lovebloom <francesca@brainiumstudios.com>"]
 edition = "2018"
-description = "Opinionated convenience wrappers for `std::process::Command` and friends"
+description = "Opinionated convenience wrappers for `std::process::Command` and friends."
 documentation = "https://docs.rs/bossy"
 repository = "https://github.com/BrainiumLLC/bossy"
 readme = "README.md"
