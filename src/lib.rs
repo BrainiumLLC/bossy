@@ -15,13 +15,19 @@ mod result {
 pub use self::{error::*, handle::*, output::*, result::*};
 pub use std::process::{ChildStderr, ChildStdin, ChildStdout, ExitStatus, Stdio};
 
-use std::{ffi::OsStr, process};
+use std::{ffi::OsStr, fmt::{self, Display}, process};
 
 /// Build and run commands to your heart's content.
 #[derive(Debug)]
 pub struct Command {
     inner: process::Command,
     display: String,
+}
+
+impl Display for Command {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.display())
+    }
 }
 
 impl Command {

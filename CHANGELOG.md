@@ -1,5 +1,9 @@
 # Unreleased
 
+# 0.1.3 (2020-11-05)
+
+- Implemented `std::fmt::Display` for `bossy::Command`.
+
 # 0.1.2 (2020-08-06)
 
 - Fix mistakes in README.
