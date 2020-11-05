@@ -38,7 +38,7 @@ impl Cause {
 
     fn status(&self) -> Option<ExitStatus> {
         if let Self::CommandFailed(status) = self {
-            Some(status.clone())
+            Some(*status)
         } else {
             self.output().map(|output| output.status())
         }

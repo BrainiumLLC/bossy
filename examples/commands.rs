@@ -1,4 +1,5 @@
 use bossy::Command;
+use simple_logger::SimpleLogger;
 use std::{io::Write as _, path::Path};
 
 // `bossy::Error` contains detailed error information; the process failing to
@@ -7,7 +8,7 @@ use std::{io::Write as _, path::Path};
 // contents.
 fn main() -> bossy::Result<()> {
     // We generate a ton of helpful logging, if you're into that sort of thing.
-    simple_logger::init().unwrap();
+    SimpleLogger::new().init().unwrap();
 
     let path = Path::new("src");
     println!("{:?} directory contents:", path);
