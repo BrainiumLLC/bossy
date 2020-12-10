@@ -71,4 +71,8 @@ impl Handle {
         let Inner { command, inner } = self.take();
         Error::from_output_result(command, inner.wait_with_output())
     }
+
+    pub fn leak(self) {
+        self.take();
+    }
 }

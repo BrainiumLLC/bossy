@@ -1,5 +1,8 @@
 # Unreleased
 
+- Added convenience methods to `bossy::Command` for setting `bossy::Stdio::null`.
+- Added `run_and_detach` method to `bossy::Command` to make it easy to spawn daemons and the like.
+
 # 0.1.3 (2020-11-05)
 
 - Implemented `std::fmt::Display` for `bossy::Command`.

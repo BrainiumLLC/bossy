@@ -119,6 +119,16 @@ impl Command {
         self
     }
 
+    pub fn set_stdin_null(&mut self) -> &mut Self {
+        self.set_stdin(Stdio::null());
+        self
+    }
+
+    pub fn with_stdin_null(mut self) -> Self {
+        self.set_stdin_null();
+        self
+    }
+
     pub fn set_stdout(&mut self, cfg: impl Into<Stdio>) -> &mut Self {
         let cfg = cfg.into();
         log::debug!("setting stdout to {:?} on command {:?}", cfg, self.display);
@@ -141,6 +151,16 @@ impl Command {
         self
     }
 
+    pub fn set_stdout_null(&mut self) -> &mut Self {
+        self.set_stdout(Stdio::null());
+        self
+    }
+
+    pub fn with_stdout_null(mut self) -> Self {
+        self.set_stdout_null();
+        self
+    }
+
     pub fn set_stderr(&mut self, cfg: impl Into<Stdio>) -> &mut Self {
         let cfg = cfg.into();
         log::debug!("setting stderr to {:?} on command {:?}", cfg, self.display);
@@ -160,6 +180,16 @@ impl Command {
 
     pub fn with_stderr_piped(mut self) -> Self {
         self.set_stderr_piped();
+        self
+    }
+
+    pub fn set_stderr_null(&mut self) -> &mut Self {
+        self.set_stderr(Stdio::null());
+        self
+    }
+
+    pub fn with_stderr_null(mut self) -> Self {
+        self.set_stderr_null();
         self
     }
 
@@ -250,6 +280,53 @@ impl Command {
         self.run_inner()
     }
 
+    /// Run the command and then detach it from the parent process. This allows
+    /// the child process to outlive the parent process, akin to what can be
+    /// achieved using `nohup` or `setsid`. This will automatically set stdin,
+    /// stdout, and stderr to use [`Stdio::null`], so if you don't want that to
+    /// happen, then you're screwed.
+    pub fn run_and_detach(&mut self) -> Result<()> {
+        log::info!("running command {:?} and detaching", self.display);
+        // This is pretty much lifted from the implementation in Alacritty:
+        // https://github.com/alacritty/alacritty/blob/8bd2c13490f8cb6ad6b0c1104f9586b3554efea2/alacritty/src/daemon.rs
+        #[cfg(unix)]
+        unsafe {
+            use std::os::unix::process::CommandExt as _;
+
+            let display = self.display.clone();
+            self.inner.pre_exec(move || match libc::fork() {
+                -1 => {
+                    let err = std::io::Error::last_os_error();
+                    log::error!("`fork` failed for command {:?}: {}", display, err);
+                    Err(err)
+                }
+                0 => {
+                    if libc::setsid() == -1 {
+                        let err = std::io::Error::last_os_error();
+                        log::error!("`setsid` failed for command {:?}: {}", display, err);
+                        Err(err)
+                    } else {
+                        Ok(())
+                    }
+                }
+                _ => libc::_exit(0),
+            });
+        }
+        #[cfg(windows)]
+        unsafe {
+            use std::os::windows::process::CommandExt;
+            use winapi::um::winbase::{CREATE_NEW_PROCESS_GROUP, CREATE_NO_WINDOW};
+
+            self.inner
+                .creation_flags(CREATE_NEW_PROCESS_GROUP | CREATE_NO_WINDOW);
+        }
+        self.set_stdin_null()
+            .set_stdout_null()
+            .set_stderr_null()
+            .run_inner()
+            .map(|handle| handle.leak())
+    }
+
     /// Run the command and block until it exits.
     pub fn run_and_wait(&mut self) -> Result<ExitStatus> {
         log::info!("running command {:?} and waiting for exit", self.display);
@@ -258,7 +335,7 @@ impl Command {
 
     /// Run the command and block until its output is collected. This will
     /// automatically set stdout and stderr to use [`Stdio::piped`], so if you
-    /// don't want that to be happen, then you're screwed.
+    /// don't want that to happen, then you're screwed.
     pub fn run_and_wait_for_output(&mut self) -> Result<Output> {
         log::info!("running command {:?} and waiting for output", self.display);
         self.set_stdout_piped()

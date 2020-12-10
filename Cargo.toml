@@ -14,5 +14,11 @@ license = "Apache-2.0/MIT"
 [dependencies]
 log = "0.4.11"
 
+[target.'cfg(unix)'.dependencies]
+libc = "0.2.81"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3.9", features = ["minwinbase"] }
+
 [dev-dependencies]
 simple_logger = "1.6.0"
