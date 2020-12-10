@@ -1,5 +1,7 @@
 # Unreleased
 
+# 0.1.4 (2020-12-09)
+
 - Added convenience methods to `bossy::Command` for setting `bossy::Stdio::null`.
 - Added `run_and_detach` method to `bossy::Command` to make it easy to spawn daemons and the like.
 
