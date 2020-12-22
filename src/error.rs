@@ -1,4 +1,4 @@
-use crate::{ExitStatus, Handle, Output};
+use crate::{ExitStatus, Handle, Output, OutputStream};
 use std::{
     error::Error as StdError,
     fmt::{self, Display},
@@ -12,6 +12,10 @@ pub enum Cause {
     WaitFailed(io::Error),
     CommandFailed(ExitStatus),
     CommandFailedWithOutput(Output),
+    InvalidUtf8 {
+        stream: OutputStream,
+        source: std::str::Utf8Error,
+    },
 }
 
 impl Cause {
@@ -27,8 +31,8 @@ impl Cause {
         }
     }
 
-    fn from_output(output: process::Output) -> Result<Output, Self> {
-        let output = Output::new(output);
+    fn from_output(command: String, output: process::Output) -> Result<Output, Self> {
+        let output = Output::new(command, output);
         if output.success() {
             Ok(output)
         } else {
@@ -99,6 +103,11 @@ impl Display for Error {
                     write!(f, " stderr was empty.")
                 }
             }
+            Cause::InvalidUtf8 { stream, source, .. } => write!(
+                f,
+                "{} for command {:?} contained invalid UTF-8: {}",
+                stream, self.command, source,
+            ),
         }
     }
 }
@@ -108,6 +117,7 @@ impl StdError for Error {
         match &self.cause {
             Cause::SpawnFailed(err) => Some(err as _),
             Cause::WaitFailed(err) => Some(err as _),
+            Cause::InvalidUtf8 { source, .. } => Some(source as _),
             _ => None,
         }
     }
@@ -130,7 +140,7 @@ impl Error {
     ) -> Result<Output, Self> {
         result
             .map_err(Cause::from_io_err)
-            .and_then(Cause::from_output)
+            .and_then(|output| Cause::from_output(command.clone(), output))
             .map_err(|cause| Self { command, cause })
     }
 
@@ -146,6 +156,17 @@ impl Error {
                 cause: Cause::from_io_err(err),
             }),
         }
+    }
+
+    pub(crate) fn from_utf8_result<'a>(
+        command: &str,
+        stream: OutputStream,
+        result: Result<&'a str, std::str::Utf8Error>,
+    ) -> Result<&'a str, Self> {
+        result.map_err(|source| Self {
+            command: command.to_owned(),
+            cause: Cause::InvalidUtf8 { stream, source },
+        })
     }
 
     pub fn command(&self) -> &str {
@@ -164,7 +185,7 @@ impl Error {
         self.output().map(|output| output.stdout())
     }
 
-    pub fn stdout_str(&self) -> Option<Result<&str, str::Utf8Error>> {
+    pub fn stdout_str(&self) -> Option<crate::Result<&str>> {
         self.output().map(|output| output.stdout_str())
     }
 
@@ -172,7 +193,7 @@ impl Error {
         self.output().map(|output| output.stderr())
     }
 
-    pub fn stderr_str(&self) -> Option<Result<&str, str::Utf8Error>> {
+    pub fn stderr_str(&self) -> Option<crate::Result<&str>> {
         self.output().map(|output| output.stderr_str())
     }
 }

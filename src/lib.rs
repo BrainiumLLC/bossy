@@ -347,4 +347,12 @@ impl Command {
             .run_inner()?
             .wait_for_output()
     }
+
+    pub fn run_and_wait_for_str<T>(&mut self, f: impl FnOnce(&str) -> T) -> Result<T> {
+        self.run_and_wait_for_output()?.stdout_str().map(f)
+    }
+
+    pub fn run_and_wait_for_string(&mut self) -> Result<String> {
+        self.run_and_wait_for_str(ToOwned::to_owned)
+    }
 }
