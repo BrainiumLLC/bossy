@@ -1,5 +1,9 @@
 # Unreleased
 
+# 0.2.1 (2021-01-08)
+
+- Added `code` convenience method to `bossy::Error` to streamline the common pattern `err.status().and_then(|status| status.code())`.
+
 # 0.2.0 (2020-12-21)
 
 - **Breaking:** the `stdout_str` and `stderr_str` methods on `bossy::Output` and `bossy::Error` now use `bossy::Error` instead of `std::str::Utf8Error` as their error type.

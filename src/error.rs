@@ -177,6 +177,10 @@ impl Error {
         self.cause.status()
     }
 
+    pub fn code(&self) -> Option<i32> {
+        self.status().and_then(|status| status.code())
+    }
+
     pub fn output(&self) -> Option<&Output> {
         self.cause.output()
     }
