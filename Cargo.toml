@@ -18,7 +18,7 @@ log = "0.4.11"
 libc = "0.2.81"
 
 [target.'cfg(windows)'.dependencies]
-winapi = { version = "0.3.9", features = ["minwinbase"] }
+winapi = { version = "0.3.9", features = ["winbase"] }
 
 [dev-dependencies]
 simple_logger = "1.11.0"
