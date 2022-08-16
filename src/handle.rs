@@ -62,6 +62,17 @@ impl Handle {
         self.as_mut().inner.kill()
     }
 
+    pub fn try_wait(&mut self) -> crate::Result<Option<ExitStatus>> {
+        let Inner { command, inner } = self.as_mut();
+        inner
+            .try_wait()
+            .map_err(crate::Cause::from_io_err)
+            .map_err(|cause| crate::Error {
+                command: command.to_string(),
+                cause,
+            })
+    }
+
     pub fn wait(self) -> crate::Result<ExitStatus> {
         let Inner { command, mut inner } = self.take();
         Error::from_status_result(command, inner.wait())

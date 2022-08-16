@@ -19,7 +19,7 @@ pub enum Cause {
 }
 
 impl Cause {
-    fn from_io_err(err: io::Error) -> Self {
+    pub(crate) fn from_io_err(err: io::Error) -> Self {
         Self::WaitFailed(err)
     }
 
@@ -60,8 +60,8 @@ impl Cause {
 /// The bearer of bad news.
 #[derive(Debug)]
 pub struct Error {
-    command: String,
-    cause: Cause,
+    pub(crate) command: String,
+    pub(crate) cause: Cause,
 }
 
 impl Display for Error {
